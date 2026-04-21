@@ -1,0 +1,372 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>API Biblioteca — Frontend</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <header>
+    <h1>API Biblioteca — Autores, Categorias, Livros & Usuarios</h1>
+    <nav>
+      <button id="tab-autores" class="active">Autores</button>
+      <button id="tab-categorias">Categorias</button>
+      <button id="tab-livros">Livros</button>
+      <button id="tab-usuarios">Usuarios</button>
+      <button id="logout-btn" class="btn logout" style="margin-left: auto;">Logout</button>
+    </nav>
+  </header>
+
+  <!-- Login Section -->
+  <section id="login-section" class="login-panel">
+    <div class="login-container">
+      <h2>Login</h2>
+      <form id="login-form" class="login-form">
+        <div class="form-group">
+          <label for="login-email">Email</label>
+          <input id="login-email" type="email" placeholder="Digite seu email" required aria-label="Email">
+        </div>
+        <div class="form-group">
+          <label for="login-senha">Senha</label>
+          <input id="login-senha" type="password" placeholder="Digite sua senha" required aria-label="Senha">
+        </div>
+        <button type="submit" class="btn login-btn">Entrar</button>
+      </form>
+      <div id="login-error" class="error-message hidden"></div>
+    </div>
+  </section>
+
+  <main class="hidden">
+    <section id="autores-section" class="panel">
+      <h2>Autores</h2>
+
+      <div class="row">
+        <div style="display:flex;gap:8px;align-items:center;width:100%;">
+          <button id="novo-autor-btn" class="btn" type="button">Novo Autor</button>
+          <div style="flex:1"></div>
+        </div>
+
+        <div class="search">
+          <input id="autor-search" placeholder="Buscar autores..." aria-label="Buscar autores">
+        </div>
+      </div>
+
+      <ul id="autores-list" class="list"></ul>
+      <div id="autores-empty" class="empty hidden">Nenhum autor encontrado.</div>
+    </section>
+
+    <section id="categorias-section" class="panel hidden">
+      <h2>Categorias</h2>
+
+      <div class="row">
+        <div style="display:flex;gap:8px;align-items:center;width:100%;">
+          <button id="nova-categoria-btn" class="btn" type="button">Nova Categoria</button>
+          <div style="flex:1"></div>
+        </div>
+
+        <div class="search">
+          <input id="categoria-search" placeholder="Buscar categorias..." aria-label="Buscar categorias">
+        </div>
+      </div>
+
+      <ul id="categorias-list" class="list"></ul>
+      <div id="categorias-empty" class="empty hidden">Nenhuma categoria encontrada.</div>
+    </section>
+
+    <section id="livros-section" class="panel hidden">
+      <h2>Livros</h2>
+
+      <div class="row">
+        <div style="display:flex;gap:8px;align-items:center;width:100%;">
+          <button id="novo-livro-btn" class="btn" type="button">Novo Livro</button>
+          <div style="flex:1"></div>
+        </div>
+
+        <div class="search">
+          <input id="livro-search" placeholder="Buscar livros..." aria-label="Buscar livros">
+        </div>
+      </div>
+
+      <ul id="livros-list" class="list"></ul>
+      <div id="livros-empty" class="empty hidden">Nenhum livro encontrado.</div>
+    </section>
+
+    <section id="usuarios-section" class="panel hidden">
+      <h2>Usuarios</h2>
+
+      <div class="row">
+        <div style="display:flex;gap:8px;align-items:center;width:100%;">
+          <button id="novo-usuario-btn" class="btn" type="button">Novo Usuario</button>
+          <div style="flex:1"></div>
+        </div>
+
+        <div class="search">
+          <input id="usuario-search" placeholder="Buscar usuarios..." aria-label="Buscar usuarios">
+        </div>
+      </div>
+
+      <ul id="usuarios-list" class="list"></ul>
+      <div id="usuarios-empty" class="empty hidden">Nenhum usuario encontrado.</div>
+    </section>
+  </main>
+
+  <!-- Autor modal (ADD / EDIT) -->
+  <div id="autor-modal" class="modal hidden" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal-content" role="document">
+      <div class="modal-header">
+        <h3 id="autor-modal-title">Novo Autor</h3>
+        <button id="autor-modal-close" class="btn icon close" aria-label="Fechar">&times;</button>
+      </div>
+      <form id="autor-modal-form" class="form-grid">
+        <div class="form-group full-width">
+          <label for="autor-nome-modal">Nome do Autor</label>
+          <input id="autor-nome-modal" placeholder="Ex: Machado de Assis" maxlength="200" required aria-label="Nome do autor">
+          <div class="counter"><span id="autor-counter">0</span>/200</div>
+        </div>
+        <div class="form-actions">
+          <button type="button" id="autor-modal-cancel" class="btn cancel">Cancelar</button>
+          <button type="submit" id="autor-modal-save" class="btn save">Salvar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Autor View Modal -->
+  <div id="autor-view-modal" class="modal hidden" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal-content" role="document">
+      <div class="modal-header">
+        <h3 id="autor-view-title">Detalhes do Autor</h3>
+        <button id="autor-view-close" class="btn icon close" aria-label="Fechar">&times;</button>
+      </div>
+      <div id="autor-view-content" class="view-content">
+        <!-- Detalhes preenchidos via JS -->
+      </div>
+      <div class="form-actions">
+        <button type="button" id="autor-view-ok" class="btn save">Fechar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Categoria modal (ADD / EDIT) -->
+  <div id="categoria-modal" class="modal hidden" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal-content" role="document">
+      <div class="modal-header">
+        <h3 id="categoria-modal-title">Nova Categoria</h3>
+        <button id="categoria-modal-close" class="btn icon close" aria-label="Fechar">&times;</button>
+      </div>
+      <form id="categoria-modal-form" class="form-grid">
+        <div class="form-group full-width">
+          <label for="categoria-nome-modal">Nome da Categoria</label>
+          <input id="categoria-nome-modal" placeholder="Ex: Ficção Científica" maxlength="200" required aria-label="Nome da categoria">
+          <div class="counter"><span id="categoria-counter">0</span>/200</div>
+        </div>
+        <div class="form-actions">
+          <button type="button" id="categoria-modal-cancel" class="btn cancel">Cancelar</button>
+          <button type="submit" id="categoria-modal-save" class="btn save">Salvar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Categoria View Modal -->
+  <div id="categoria-view-modal" class="modal hidden" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal-content" role="document">
+      <div class="modal-header">
+        <h3 id="categoria-view-title">Detalhes da Categoria</h3>
+        <button id="categoria-view-close" class="btn icon close" aria-label="Fechar">&times;</button>
+      </div>
+      <div id="categoria-view-content" class="view-content">
+        <!-- Detalhes preenchidos via JS -->
+      </div>
+      <div class="form-actions">
+        <button type="button" id="categoria-view-ok" class="btn save">Fechar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Livro modal (usado para ADD e EDIT) -->
+  <div id="livro-modal" class="modal hidden" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal-content large" role="document">
+      <div class="modal-header">
+        <h3 id="livro-modal-title">Novo Livro</h3>
+        <button id="livro-modal-close" class="btn icon close" aria-label="Fechar">&times;</button>
+      </div>
+      <form id="livro-modal-form" class="form-grid">
+        <div class="form-group full-width">
+          <label for="livro-titulo">Título</label>
+          <input id="livro-titulo" placeholder="Ex: O Senhor dos Anéis" maxlength="200" required aria-label="Título do livro">
+          <div class="counter"><span id="livro-counter">0</span>/200</div>
+        </div>
+
+        <div class="form-group">
+          <label for="livro-autor">Autor</label>
+          <select id="livro-autor" aria-label="Autor do livro" required>
+            <option value="">-- Selecione o Autor --</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="livro-categoria">Categoria</label>
+          <select id="livro-categoria" aria-label="Categoria do livro" required>
+            <option value="">-- Selecione a Categoria --</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="livro-edicao">Edição</label>
+          <input id="livro-edicao" placeholder="Ex: 1ª" maxlength="10" aria-label="Edição do livro">
+        </div>
+        
+        <div class="form-group">
+          <label for="livro-idioma">Idioma</label>
+          <input id="livro-idioma" placeholder="Ex: Português" maxlength="100" aria-label="Idioma do livro">
+        </div>
+
+        <div class="form-group">
+          <label for="livro-num_paginas">Número de Páginas</label>
+          <input id="livro-num_paginas" type="number" min="0" placeholder="Ex: 320" aria-label="Número de páginas">
+        </div>
+        
+        <div class="form-group">
+          <label for="livro-editora">Editora</label>
+          <input id="livro-editora" placeholder="Ex: HarperCollins" maxlength="200" aria-label="Editora">
+        </div>
+
+        <div class="form-group">
+          <label for="livro-estoque">Estoque</label>
+          <input id="livro-estoque" type="number" min="0" placeholder="Ex: 10" aria-label="Quantidade em estoque">
+        </div>
+        
+        <div class="form-group">
+          <label for="livro-data_publicacao">Data de Publicação</label>
+          <input id="livro-data_publicacao" type="date" aria-label="Data de publicação">
+        </div>
+
+        <div class="form-group full-width">
+          <label for="livro-img">Capa do Livro (Imagem)</label>
+          <input id="livro-img" type="file" accept="image/*" aria-label="Capa do livro">
+        </div>
+
+        <div class="form-group full-width">
+          <label for="livro-descricao">Descrição</label>
+          <textarea id="livro-descricao" placeholder="Escreva um breve resumo do livro (opcional)" rows="4" aria-label="Descrição do livro"></textarea>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" id="livro-modal-cancel" class="btn cancel">Cancelar</button>
+          <button type="submit" id="livro-modal-save" class="btn save">Salvar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Livro View Modal -->
+  <div id="livro-view-modal" class="modal hidden" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal-content large" role="document">
+      <div class="modal-header">
+        <h3 id="livro-view-title">Detalhes do Livro</h3>
+        <button id="livro-view-close" class="btn icon close" aria-label="Fechar">&times;</button>
+      </div>
+      <div id="livro-view-content" class="view-content">
+        <!-- Detalhes preenchidos via JS -->
+      </div>
+      <div class="form-actions">
+        <button type="button" id="livro-view-ok" class="btn save">Fechar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Usuario modal (ADD / EDIT) -->
+  <div id="usuario-modal" class="modal hidden" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal-content large" role="document">
+      <div class="modal-header">
+        <h3 id="usuario-modal-title">Novo Usuario</h3>
+        <button id="usuario-modal-close" class="btn icon close" aria-label="Fechar">&times;</button>
+      </div>
+      <form id="usuario-modal-form" class="form-grid">
+        <div class="form-group">
+          <label for="usuario-nome-modal">Nome</label>
+          <input id="usuario-nome-modal" placeholder="Ex: João Silva" maxlength="200" required aria-label="Nome do usuario">
+        </div>
+        <div class="form-group">
+          <label for="usuario-matricula-modal">Matrícula</label>
+          <input id="usuario-matricula-modal" placeholder="Ex: 12345" maxlength="50" aria-label="Matrícula">
+        </div>
+        <div class="form-group">
+          <label for="usuario-perfil-modal">Perfil</label>
+          <select id="usuario-perfil-modal" required aria-label="Perfil">
+            <option value="">-- Selecione --</option>
+            <option value="aluno">Aluno</option>
+            <option value="professor">Professor</option>
+            <option value="administrador">Administrador</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="usuario-curso-modal">Curso</label>
+          <input id="usuario-curso-modal" placeholder="Ex: Engenharia" maxlength="100" aria-label="Curso">
+        </div>
+        <div class="form-group">
+          <label for="usuario-cpf-modal">CPF</label>
+          <input id="usuario-cpf-modal" placeholder="Ex: 123.456.789-00" maxlength="14" required aria-label="CPF">
+        </div>
+        <div class="form-group">
+          <label for="usuario-data_nascimento-modal">Data de Nascimento</label>
+          <input id="usuario-data_nascimento-modal" type="date" required aria-label="Data de nascimento">
+        </div>
+        <div class="form-group">
+          <label for="usuario-email-modal">Email</label>
+          <input id="usuario-email-modal" type="email" placeholder="Ex: joao@email.com" maxlength="200" required aria-label="Email">
+        </div>
+        <div class="form-group">
+          <label for="usuario-senha-modal">Senha</label>
+          <input id="usuario-senha-modal" type="password" placeholder="Senha" maxlength="100" required aria-label="Senha">
+        </div>
+        <div class="form-group">
+          <label for="usuario-status-modal">Status</label>
+          <select id="usuario-status-modal" required aria-label="Status">
+            <option value="">-- Selecione --</option>
+            <option value="ativo">Ativo</option>
+            <option value="inativo">Inativo</option>
+          </select>
+        </div>
+        <div class="form-actions">
+          <button type="button" id="usuario-modal-cancel" class="btn cancel">Cancelar</button>
+          <button type="submit" id="usuario-modal-save" class="btn save">Salvar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Usuario View Modal -->
+  <div id="usuario-view-modal" class="modal hidden" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal-content large" role="document">
+      <div class="modal-header">
+        <h3 id="usuario-view-title">Detalhes do Usuario</h3>
+        <button id="usuario-view-close" class="btn icon close" aria-label="Fechar">&times;</button>
+      </div>
+      <div id="usuario-view-content" class="view-content">
+        <!-- Detalhes preenchidos via JS -->
+      </div>
+      <div class="form-actions">
+        <button type="button" id="usuario-view-ok" class="btn save">Fechar</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
+
+  <!-- Confirmation modal -->
+  <div id="confirm-modal" class="modal hidden" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal-content">
+      <p id="confirm-message">Tem certeza?</p>
+      <div class="modal-actions">
+        <button id="confirm-cancel" class="btn cancel">Cancelar</button>
+        <button id="confirm-ok" class="btn delete">Apagar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/app.js" type="module"></script>
+</body>
+</html>
